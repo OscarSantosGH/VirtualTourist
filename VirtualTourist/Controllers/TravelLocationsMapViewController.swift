@@ -13,13 +13,36 @@ class TravelLocationsMapViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
     
+    var canDropPin = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        let gesture:UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(dropPinGesture(gesture:)))
+        gesture.minimumPressDuration = 1
+        gesture.numberOfTapsRequired = 1
+        gesture.numberOfTouchesRequired = 1
+        gesture.allowableMovement = 500
+        mapView.addGestureRecognizer(gesture)
     }
     
+    @objc func dropPinGesture(gesture:UILongPressGestureRecognizer){
+        switch gesture.state {
+        case .began:
+            if canDropPin{
+                canDropPin = false
+                dropPin()
+            }
+        default:
+            canDropPin = true
+        }
+    }
+    
+    func dropPin(){
+        print("pin dropped")
+    }
 
     /*
     // MARK: - Navigation
