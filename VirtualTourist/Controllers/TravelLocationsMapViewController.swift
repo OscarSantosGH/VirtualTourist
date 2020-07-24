@@ -23,26 +23,29 @@ class TravelLocationsMapViewController: UIViewController {
         let gesture:UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(dropPinGesture(gesture:)))
         gesture.numberOfTouchesRequired = 1
         mapView.addGestureRecognizer(gesture)
+        
+        mapView.delegate = self
     }
     
     @objc func dropPinGesture(gesture:UILongPressGestureRecognizer){
         
         if gesture.state == .began {
             canDropPin = false
-            dropPin()
             
             let touch: CGPoint = gesture.location(in: self.mapView)
             let coordinate: CLLocationCoordinate2D = self.mapView.convert(touch, toCoordinateFrom: self.mapView)
-
             self.mapView.setCenter(coordinate, animated: true)
+            
+            dropPin(coordinate: coordinate)
 
         }else{
             canDropPin = true
         }
     }
     
-    func dropPin(){
-        print("pin dropped")
+    func dropPin(coordinate:CLLocationCoordinate2D){
+        let pin = TravelPin(coordinate: coordinate)
+        mapView.addAnnotation(pin)
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
     }
@@ -57,4 +60,8 @@ class TravelLocationsMapViewController: UIViewController {
     }
     */
 
+}
+
+extension TravelLocationsMapViewController: MKMapViewDelegate{
+    
 }
