@@ -21,6 +21,11 @@ class PhotoAlbumViewController: UIViewController {
         configureCollectionView()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+    }
+    
     func configureCollectionView(){
         collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: "photoCell")
         collectionView.dataSource = self
@@ -32,11 +37,17 @@ class PhotoAlbumViewController: UIViewController {
         let itemWidth = availableWidth / 3
         
         flowLayout.sectionInset = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
-        flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth + 40)
+        flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
     }
 
 
     @IBAction func backAction(_ sender: Any) {
+        UIView.animate(withDuration: 0.5) { [weak self] in
+            guard let self = self else {return}
+            let frame = self.view.frame
+            //let yComponent = UIScreen.main.bounds.height - 200
+            self.view.frame = CGRect(x: 0, y: self.view.frame.maxY, width: frame.width, height: frame.height)
+        }
     }
     
     @IBAction func newCollectionAction(_ sender: Any) {
@@ -60,7 +71,7 @@ extension PhotoAlbumViewController: UICollectionViewDataSource{
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCell
-        
+        cell.backgroundColor = .cyan
         return cell
     }
     

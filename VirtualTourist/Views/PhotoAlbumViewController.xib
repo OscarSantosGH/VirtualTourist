@@ -36,7 +36,7 @@
                     </connections>
                 </button>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="bj0-gN-psJ">
-                    <rect key="frame" x="0.0" y="203" width="414" height="609"/>
+                    <rect key="frame" x="0.0" y="238" width="414" height="574"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="jnJ-EF-YCe">
                         <size key="itemSize" width="128" height="128"/>
@@ -46,7 +46,7 @@
                     </collectionViewFlowLayout>
                 </collectionView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aYf-qq-DYx" userLabel="header">
-                    <rect key="frame" x="0.0" y="159" width="414" height="44"/>
+                    <rect key="frame" x="0.0" y="194" width="414" height="44"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xrj-Yh-QCW">
                             <rect key="frame" x="24" y="8" width="34" height="28"/>
@@ -74,7 +74,7 @@
                 <constraint firstItem="OF2-UC-JVF" firstAttribute="trailing" secondItem="fnl-2z-Ty3" secondAttribute="trailing" id="PJB-8n-C4I"/>
                 <constraint firstItem="aYf-qq-DYx" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="RDC-hH-Quf"/>
                 <constraint firstItem="AcG-2i-dcM" firstAttribute="trailing" secondItem="fnl-2z-Ty3" secondAttribute="trailing" id="Uiq-Ng-GrQ"/>
-                <constraint firstItem="aYf-qq-DYx" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="115" id="aoL-gY-UKn"/>
+                <constraint firstItem="aYf-qq-DYx" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="150" id="aoL-gY-UKn"/>
                 <constraint firstItem="bj0-gN-psJ" firstAttribute="top" secondItem="aYf-qq-DYx" secondAttribute="bottom" id="eDK-Oy-Awu"/>
                 <constraint firstItem="bj0-gN-psJ" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="etm-0a-xl9"/>
                 <constraint firstItem="AcG-2i-dcM" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="hUj-Ds-cxm"/>

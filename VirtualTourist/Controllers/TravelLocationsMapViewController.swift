@@ -14,17 +14,30 @@ class TravelLocationsMapViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     
     var canDropPin = true
+    var photoAlbumViewController = PhotoAlbumViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
-        
         let gesture:UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(dropPinGesture(gesture:)))
         gesture.numberOfTouchesRequired = 1
         mapView.addGestureRecognizer(gesture)
         
         mapView.delegate = self
+        
+        addPhotoAlbumViewController()
+    }
+    
+    func addPhotoAlbumViewController() {
+        // 1- Add bottomSheetVC as a child view
+        self.addChild(photoAlbumViewController)
+        self.view.addSubview(photoAlbumViewController.view)
+        photoAlbumViewController.didMove(toParent: self)
+
+        // 2- Adjust bottomSheet frame and initial position.
+        let height = view.frame.height
+        let width  = view.frame.width
+        photoAlbumViewController.view.frame = CGRect(x: 0, y: self.view.frame.maxY, width: width, height: height)
     }
     
     @objc func dropPinGesture(gesture:UILongPressGestureRecognizer){
@@ -34,7 +47,7 @@ class TravelLocationsMapViewController: UIViewController {
             
             let touch: CGPoint = gesture.location(in: self.mapView)
             let coordinate: CLLocationCoordinate2D = self.mapView.convert(touch, toCoordinateFrom: self.mapView)
-            self.mapView.setCenter(coordinate, animated: true)
+            //self.mapView.setCenter(coordinate, animated: true)
             
             dropPin(coordinate: coordinate)
 
@@ -49,21 +62,28 @@ class TravelLocationsMapViewController: UIViewController {
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
     }
+    
+    
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func showPhotoAlbumView(pinToShow:TravelPin){
+        var mapRect = mapView.visibleMapRect
+        let pinPos = MKMapPoint.init(pinToShow.coordinate)
+        mapRect.origin.x = pinPos.x - mapRect.size.width * 0.5
+        mapRect.origin.y = pinPos.y - mapRect.size.height * 0.15
+        mapView.setVisibleMapRect(mapRect, animated: true)
+        
+        UIView.animate(withDuration: 0.5) { [weak self] in
+            guard let self = self else {return}
+            let height = self.view.frame.height
+            let width  = self.view.frame.width
+            self.photoAlbumViewController.view.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        }
     }
-    */
 
 }
 
 extension TravelLocationsMapViewController: MKMapViewDelegate{
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        print("coordinate: \(view.annotation?.coordinate)")
+        showPhotoAlbumView(pinToShow: view.annotation as! TravelPin)
     }
 }
