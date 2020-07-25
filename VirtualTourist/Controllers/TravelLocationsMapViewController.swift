@@ -63,5 +63,7 @@ class TravelLocationsMapViewController: UIViewController {
 }
 
 extension TravelLocationsMapViewController: MKMapViewDelegate{
-    
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        print("coordinate: \(view.annotation?.coordinate)")
+    }
 }
