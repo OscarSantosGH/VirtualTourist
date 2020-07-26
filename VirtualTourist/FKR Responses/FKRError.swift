@@ -11,52 +11,10 @@ import Foundation
 struct FKRError: Error, Decodable{
     let stat:String
     let code:Int
+    let message:String
 }
 
 extension FKRError{
-    var message: String{
-        switch code {
-        case 1:
-            return "Too many tags in ALL query"
-        case 2:
-            return "Unknown user"
-        case 3:
-            return "Parameterless searches have been disabled"
-        case 4:
-            return "You don't have permission to view this pool"
-        case 5:
-            return "User deleted"
-        case 10:
-            return "Sorry, the Flickr search API is not currently available."
-        case 11:
-            return "No valid machine tags"
-        case 12:
-            return "Exceeded maximum allowable machine tags"
-        case 17:
-            return "You can only search within your own contacts"
-        case 18:
-            return "Illogical arguments"
-        case 100:
-            return "Invalid API Key"
-        case 105:
-            return "Service currently unavailable"
-        case 106:
-            return "Write operation failed"
-        case 111:
-            return "Format 'xxx' not found"
-        case 112:
-            return "Method 'xxx' not found"
-        case 114:
-            return "Invalid SOAP envelope"
-        case 115:
-            return "Invalid XML-RPC Method Call"
-        case 116:
-            return "Bad URL found"
-        default:
-            return "Something went wrong"
-        }
-    }
-    
     var errorDescription: String{
         switch code {
         case 1:
@@ -96,7 +54,7 @@ extension FKRError{
         case 116:
             return "One or more arguments contained a URL that has been used for abuse on Flickr."
         default:
-            return "Try again later."
+            return "Something went wrong"
         }
     }
 }
