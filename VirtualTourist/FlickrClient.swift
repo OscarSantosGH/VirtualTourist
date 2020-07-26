@@ -25,5 +25,36 @@ class FlickrClient{
     }
     
     
-    
+    class func getPhotosFromLocation(lat:Double, long:Double, page:Int = 1, completion: @escaping ([FKRPhotoResponse]?, Error?)->Void){
+        guard let url = URL(string: Endpoints.getPhotos.stringValue + "&lat=" + String(lat) + "&lon=" + String(long) + "&page=" + String(page)) else {return}
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if error != nil {
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+            }
+            
+            guard let data = data else{
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+                return
+            }
+            
+            let decoder = JSONDecoder()
+            
+            do{
+                let response = try decoder.decode(FKRPhotosSearchResponse.self, from: data)
+                let photos = response.photos
+                DispatchQueue.main.async {
+                    completion(photos.photo, nil)
+                }
+            }catch{
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+            }
+        }
+        task.resume()
+    }
 }
