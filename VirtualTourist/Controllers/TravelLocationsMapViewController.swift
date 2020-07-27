@@ -66,6 +66,9 @@ class TravelLocationsMapViewController: UIViewController {
     
 
     func showPhotoAlbumView(pinToShow:TravelPin){
+        photoAlbumViewController.location = pinToShow.coordinate
+        photoAlbumViewController.downloadPhotos()
+        
         var mapRect = mapView.visibleMapRect
         let pinPos = MKMapPoint.init(pinToShow.coordinate)
         mapRect.origin.x = pinPos.x - mapRect.size.width * 0.5

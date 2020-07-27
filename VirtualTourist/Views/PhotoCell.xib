@@ -7,13 +7,9 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PhotoCell" customModule="VirtualTourist" customModuleProvider="target">
-            <connections>
-                <outlet property="photoImageView" destination="smM-n2-enu" id="3Sd-B5-foI"/>
-            </connections>
-        </placeholder>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PhotoCell" customModule="VirtualTourist" customModuleProvider="target"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="photoCell" id="gTV-IL-0wX" customClass="PhotoCell" customModule="VirtualTourist" customModuleProvider="target">
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="photoCell" id="gTV-IL-0wX" userLabel="PhotoCell" customClass="PhotoCell" customModule="VirtualTourist" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="82" height="79"/>
             <autoresizingMask key="autoresizingMask"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
@@ -35,6 +31,9 @@
             </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="82" height="79"/>
+            <connections>
+                <outlet property="photoImageView" destination="smM-n2-enu" id="I6g-hD-iqu"/>
+            </connections>
             <point key="canvasLocation" x="156.52173913043478" y="151.00446428571428"/>
         </collectionViewCell>
     </objects>

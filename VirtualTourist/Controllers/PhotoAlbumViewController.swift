@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MapKit
 
 class PhotoAlbumViewController: UIViewController {
     
@@ -14,6 +15,9 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var backButton: UIButton!
     @IBOutlet weak var newCollectionButton: UIButton!
+    
+    var photos = [FKRPhotoResponse]()
+    var location = CLLocationCoordinate2D()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +31,8 @@ class PhotoAlbumViewController: UIViewController {
     }
     
     func configureCollectionView(){
-        collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: "photoCell")
+        let nib = UINib(nibName: "PhotoCell", bundle: nil)
+        collectionView.register(nib, forCellWithReuseIdentifier: "photoCell")
         collectionView.dataSource = self
         
         let width = view.bounds.width
@@ -38,6 +43,23 @@ class PhotoAlbumViewController: UIViewController {
         
         flowLayout.sectionInset = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
         flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
+    }
+    
+    func downloadPhotos(){
+        FlickrClient.shared.getPhotosFromLocation(lat: location.latitude, long: location.longitude) { [weak self] (photos, error) in
+            guard let self = self else {return}
+            if error != nil{
+                if let fkrError = error as? FKRError{
+                    self.presentVTAlert(title: fkrError.message, message: fkrError.errorDescription)
+                }else{
+                    self.presentVTAlert(title: "Something went wrong", message: error!.localizedDescription)
+                }
+            }else{
+                guard let photos = photos else {return}
+                self.photos = photos
+                self.collectionView.reloadData()
+            }
+        }
     }
 
 
@@ -66,13 +88,18 @@ class PhotoAlbumViewController: UIViewController {
 
 extension PhotoAlbumViewController: UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        18
+        photos.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let photo = photos[indexPath.row]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCell
-        cell.backgroundColor = .cyan
+        cell.setImage(photo: photo)
         return cell
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        1
     }
     
     
