@@ -34,6 +34,7 @@ class PhotoAlbumViewController: UIViewController {
         let nib = UINib(nibName: "PhotoCell", bundle: nil)
         collectionView.register(nib, forCellWithReuseIdentifier: "photoCell")
         collectionView.dataSource = self
+        collectionView.delegate = self
         
         let width = view.bounds.width
         let padding: CGFloat = 12
@@ -101,6 +102,11 @@ extension PhotoAlbumViewController: UICollectionViewDataSource{
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         1
     }
-    
-    
+}
+
+extension PhotoAlbumViewController: UICollectionViewDelegate{
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        photos.remove(at: indexPath.row)
+        collectionView.deleteItems(at: [indexPath])
+    }
 }
