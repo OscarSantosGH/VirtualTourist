@@ -15,6 +15,8 @@ class TravelLocationsMapViewController: UIViewController {
     
     var canDropPin = true
     var photoAlbumViewController = PhotoAlbumViewController()
+    
+    var persistentManager:PersistentManager!
 
     override func viewDidLoad() {
         super.viewDidLoad()
