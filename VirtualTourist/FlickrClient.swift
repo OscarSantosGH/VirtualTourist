@@ -23,7 +23,7 @@ class FlickrClient{
         var stringValue: String{
             switch self {
             case .getPhotos:
-                return Endpoints.base + "?method=flickr.photos.search&api_key=" + apiKey + "&nojsoncallback=1&format=json"
+                return Endpoints.base + "?method=flickr.photos.search&api_key=" + apiKey + "&nojsoncallback=1&format=json&per_page=50"
             }
         }
     }
