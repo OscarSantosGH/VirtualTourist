@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 import MapKit
 
 class TravelLocationsMapViewController: UIViewController {
@@ -17,6 +18,7 @@ class TravelLocationsMapViewController: UIViewController {
     var photoAlbumViewController = PhotoAlbumViewController()
     
     var persistentManager:PersistentManager!
+    var pins:[Pin] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,8 +28,30 @@ class TravelLocationsMapViewController: UIViewController {
         mapView.addGestureRecognizer(gesture)
         
         mapView.delegate = self
-        
+        fetchDataFromDataStore()
         addPhotoAlbumViewController()
+    }
+    
+    func fetchDataFromDataStore(){
+        let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
+        if let result = try? persistentManager.viewContext.fetch(fetchRequest){
+            pins = result
+            updateMapPins()
+        }
+    }
+    
+    func updateMapPins(){
+        if pins.isEmpty{
+            
+        }else{
+            var annotations:[MKAnnotation] = []
+            for pin in pins{
+                let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+                let travelPin = TravelPin(coordinate: coordinate)
+                annotations.append(travelPin)
+            }
+            mapView.addAnnotations(annotations)
+        }
     }
     
     func addPhotoAlbumViewController() {
@@ -59,11 +83,24 @@ class TravelLocationsMapViewController: UIViewController {
     }
     
     func dropPin(coordinate:CLLocationCoordinate2D){
-        let pin = TravelPin(coordinate: coordinate)
-        mapView.addAnnotation(pin)
+        let travelPin = TravelPin(coordinate: coordinate)
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
+        
+        let pin = Pin(context: persistentManager.viewContext)
+        pin.latitude = coordinate.latitude
+        pin.longitude = coordinate.longitude
+        do{
+            try persistentManager.viewContext.save()
+            pins.append(pin)
+            mapView.addAnnotation(travelPin)
+        }catch{
+            presentVTAlert(title: "Error saving the location", message: error.localizedDescription)
+        }
+        
     }
+    
+    
     
     
 

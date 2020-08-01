@@ -12,6 +12,10 @@ import CoreData
 class PersistentManager{
     let persistentContainer:NSPersistentContainer
     
+    var viewContext:NSManagedObjectContext {
+        return persistentContainer.viewContext
+    }
+    
     init(modelName:String){
         persistentContainer = NSPersistentContainer(name: modelName)
     }
