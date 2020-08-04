@@ -15,18 +15,44 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var newCollectionButton: UIBarButtonItem!
+    @IBOutlet weak var mapView: MKMapView!
     
     
     private var photos = [Photo]()
     var pin:Pin!
-    
     var persistentManager:PersistentManager!
+    // timer used to delay the animation of the zoom to the location
+    var timer:Timer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         configureCollectionView()
         configure()
+        showLocation()
+    }
+    
+    private func showLocation(){
+        // create a custom MKAnnotation for the Students Location
+        let annotation = TravelPin(pin: pin)
+        annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+        // scheduled the timer to delay the zoom animation for 1 sec
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(zoomToLocation), userInfo: nil, repeats: false)
+        mapView.isUserInteractionEnabled = false
+        mapView.addAnnotation(annotation)
+    }
+    
+    @objc func zoomToLocation(){
+        // get the coordinate
+        let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+        // create a CLLocationDistance to use it in the MKCoordinateRegion
+        let distance:CLLocationDistance = 80_000
+        // create a MKCoordinateRegion
+        let mapRegion = MKCoordinateRegion(center: coordinate, latitudinalMeters: distance, longitudinalMeters: distance)
+        // set the region to the mapView and create the zoom animation
+        mapView.setRegion(mapRegion, animated: true)
+        // invalidate the timer
+        timer.invalidate()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -35,7 +61,6 @@ class PhotoAlbumViewController: UIViewController {
     }
     
     private func configureCollectionView(){
-        //collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: "photoCell")
         collectionView.dataSource = self
         collectionView.delegate = self
         
@@ -58,21 +83,12 @@ class PhotoAlbumViewController: UIViewController {
         fetchRequest.predicate = predicate
         if let result = try? persistentManager.viewContext.fetch(fetchRequest){
             if result.isEmpty{
-                print("Ta vacio: \(result.count)")
                 downloadPhotos()
             }else{
-                print("tiene algo")
                 photos = result
                 collectionView.reloadData()
             }
         }
-        
-//        if pin.photos!.count > 0{
-//            print("tiene fotos")
-//        }else{
-//            print("ta vacio")
-//            downloadPhotos()
-//        }
     }
     
     
@@ -104,7 +120,6 @@ class PhotoAlbumViewController: UIViewController {
                     self.collectionView.reloadData()
                     do{
                        try self.persistentManager.viewContext.save()
-                        print("salvados")
                     }catch{
                         print(error.localizedDescription)
                     }

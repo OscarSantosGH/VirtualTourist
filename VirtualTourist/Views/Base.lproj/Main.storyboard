@@ -48,7 +48,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="o5c-eD-jV5">
-                                <rect key="frame" x="0.0" y="88" width="414" height="733"/>
+                                <rect key="frame" x="0.0" y="263" width="414" height="558"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="R4W-JU-II4">
                                     <size key="itemSize" width="128" height="128"/>
@@ -100,16 +100,25 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="LaX-Tw-kKK"/>
                                 </items>
                             </toolbar>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="pOT-pZ-U5v">
+                                <rect key="frame" x="0.0" y="88" width="414" height="175"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="175" id="rrv-Ox-OHM"/>
+                                </constraints>
+                            </mapView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="pOT-pZ-U5v" firstAttribute="leading" secondItem="yzg-2n-c0w" secondAttribute="leading" id="Bc6-MC-73X"/>
                             <constraint firstItem="tjx-q9-wG4" firstAttribute="trailing" secondItem="yzg-2n-c0w" secondAttribute="trailing" id="DY1-9u-GB2"/>
+                            <constraint firstItem="o5c-eD-jV5" firstAttribute="top" secondItem="pOT-pZ-U5v" secondAttribute="bottom" id="DZ4-cx-U9v"/>
                             <constraint firstItem="tjx-q9-wG4" firstAttribute="top" secondItem="o5c-eD-jV5" secondAttribute="bottom" id="HtK-Y5-XPS"/>
                             <constraint firstItem="tjx-q9-wG4" firstAttribute="leading" secondItem="yzg-2n-c0w" secondAttribute="leading" id="PVV-T2-da8"/>
                             <constraint firstAttribute="bottom" secondItem="tjx-q9-wG4" secondAttribute="bottom" constant="31" id="SZh-Oe-fH6"/>
-                            <constraint firstItem="o5c-eD-jV5" firstAttribute="top" secondItem="yzg-2n-c0w" secondAttribute="top" id="Xw3-dd-qew"/>
                             <constraint firstItem="o5c-eD-jV5" firstAttribute="leading" secondItem="yzg-2n-c0w" secondAttribute="leading" id="YW4-q3-3hC"/>
+                            <constraint firstItem="pOT-pZ-U5v" firstAttribute="top" secondItem="yzg-2n-c0w" secondAttribute="top" id="Zjd-Jc-Q40"/>
                             <constraint firstItem="o5c-eD-jV5" firstAttribute="trailing" secondItem="yzg-2n-c0w" secondAttribute="trailing" id="aXO-Nf-sRL"/>
+                            <constraint firstItem="pOT-pZ-U5v" firstAttribute="trailing" secondItem="yzg-2n-c0w" secondAttribute="trailing" id="zGG-Cw-bca"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="yzg-2n-c0w"/>
                     </view>
@@ -118,12 +127,13 @@
                     <connections>
                         <outlet property="collectionView" destination="o5c-eD-jV5" id="cx2-4B-lTF"/>
                         <outlet property="flowLayout" destination="R4W-JU-II4" id="2qX-4B-Mhs"/>
+                        <outlet property="mapView" destination="pOT-pZ-U5v" id="1LL-Ef-KAF"/>
                         <outlet property="newCollectionButton" destination="gfN-Tc-tmn" id="fXp-et-vZk"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JQT-OJ-zw6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2428.985507246377" y="119.86607142857142"/>
+            <point key="canvasLocation" x="2402.898550724638" y="119.86607142857142"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="yOZ-jH-NmK">
