@@ -10,12 +10,12 @@ import Foundation
 
 struct FKRPhotoResponse: Codable {
     let id:String
-    let owner:String
-    let secret:String
-    let server:String
-    let farm:Int
     let title:String
-    let ispublic:Int
-    let isfriend:Int
-    let isfamily:Int
+    let url:String
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case url = "url_m"
+    }
 }

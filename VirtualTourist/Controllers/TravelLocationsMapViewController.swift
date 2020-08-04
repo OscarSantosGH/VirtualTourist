@@ -15,7 +15,6 @@ class TravelLocationsMapViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     
     var canDropPin = true
-    var photoAlbumViewController = PhotoAlbumViewController()
     
     var persistentManager:PersistentManager!
     var pins:[Pin] = []
@@ -29,13 +28,15 @@ class TravelLocationsMapViewController: UIViewController {
         
         mapView.delegate = self
         fetchDataFromDataStore()
-        addPhotoAlbumViewController()
     }
     
     func fetchDataFromDataStore(){
         let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
         if let result = try? persistentManager.viewContext.fetch(fetchRequest){
             pins = result
+            print("pin result: \(result.count)")
             updateMapPins()
         }
     }
@@ -46,24 +47,12 @@ class TravelLocationsMapViewController: UIViewController {
         }else{
             var annotations:[MKAnnotation] = []
             for pin in pins{
-                let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
-                let travelPin = TravelPin(coordinate: coordinate)
-                annotations.append(travelPin)
+                let annotation = TravelPin(pin: pin)
+                annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+                annotations.append(annotation)
             }
             mapView.addAnnotations(annotations)
         }
-    }
-    
-    func addPhotoAlbumViewController() {
-        // 1- Add bottomSheetVC as a child view
-        self.addChild(photoAlbumViewController)
-        self.view.addSubview(photoAlbumViewController.view)
-        photoAlbumViewController.didMove(toParent: self)
-
-        // 2- Adjust bottomSheet frame and initial position.
-        let height = view.frame.height
-        let width  = view.frame.width
-        photoAlbumViewController.view.frame = CGRect(x: 0, y: self.view.frame.maxY, width: width, height: height)
     }
     
     @objc func dropPinGesture(gesture:UILongPressGestureRecognizer){
@@ -83,17 +72,19 @@ class TravelLocationsMapViewController: UIViewController {
     }
     
     func dropPin(coordinate:CLLocationCoordinate2D){
-        let travelPin = TravelPin(coordinate: coordinate)
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
-        
         let pin = Pin(context: persistentManager.viewContext)
         pin.latitude = coordinate.latitude
         pin.longitude = coordinate.longitude
+        
+        let annotation = TravelPin(pin: pin)
+        annotation.coordinate = coordinate
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+        
         do{
             try persistentManager.viewContext.save()
             pins.append(pin)
-            mapView.addAnnotation(travelPin)
+            mapView.addAnnotation(annotation)
         }catch{
             presentVTAlert(title: "Error saving the location", message: error.localizedDescription)
         }
@@ -101,31 +92,41 @@ class TravelLocationsMapViewController: UIViewController {
     }
     
     
-    
-    
-
-    func showPhotoAlbumView(pinToShow:TravelPin){
-        photoAlbumViewController.location = pinToShow.coordinate
-        photoAlbumViewController.downloadPhotos()
-        
-        var mapRect = mapView.visibleMapRect
-        let pinPos = MKMapPoint.init(pinToShow.coordinate)
-        mapRect.origin.x = pinPos.x - mapRect.size.width * 0.5
-        mapRect.origin.y = pinPos.y - mapRect.size.height * 0.15
-        mapView.setVisibleMapRect(mapRect, animated: true)
-        
-        UIView.animate(withDuration: 0.5) { [weak self] in
-            guard let self = self else {return}
-            let height = self.view.frame.height
-            let width  = self.view.frame.width
-            self.photoAlbumViewController.view.frame = CGRect(x: 0, y: 0, width: width, height: height)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "photoAlbumSegue"{
+            let photoAlbumVC = segue.destination as! PhotoAlbumViewController
+            photoAlbumVC.persistentManager = persistentManager
+            photoAlbumVC.pin = sender as? Pin
         }
     }
+    
 
 }
 
 extension TravelLocationsMapViewController: MKMapViewDelegate{
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        guard annotation is TravelPin else {return nil}
+        
+        let reuseId = "pin"
+
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKMarkerAnnotationView
+
+        if pinView == nil {
+            pinView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.canShowCallout = false
+            pinView?.markerTintColor = UIColor.red
+
+        } else {
+            pinView!.annotation = annotation
+        }
+
+        return pinView
+    }
+    
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        showPhotoAlbumView(pinToShow: view.annotation as! TravelPin)
+        
+        let travelPin = view.annotation as! TravelPin
+        performSegue(withIdentifier: "photoAlbumSegue", sender: travelPin.pin)
     }
 }

@@ -11,19 +11,21 @@ import UIKit
 class PhotoCell: UICollectionViewCell {
     
     @IBOutlet weak var photoImageView: UIImageView!
+    var imageURLPath: URL?
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        
-    }
-    
-    func setImage(photo:FKRPhotoResponse){
-        FlickrClient.shared.getPhotoImage(farm: photo.farm, server: photo.server, id: photo.id, secret: photo.secret) { [weak self] (image) in
+    func setImage(photo:Photo, persistentManager:PersistentManager){
+        guard let url = photo.url else {return}
+        imageURLPath = url
+        FlickrClient.shared.getPhotoImage(url: url) { [weak self] (image) in
             guard let self = self else {return}
-            guard let imageUnwrapped = image else {
+            if self.imageURLPath == url{
+                guard let imageUnwrapped = image else {return}
+                self.photoImageView.image = imageUnwrapped
+                photo.image = imageUnwrapped.jpegData(compressionQuality: 1)
+            }else{
                 return
             }
-            self.photoImageView.image = imageUnwrapped
+            
         }
     }
 

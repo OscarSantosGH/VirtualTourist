@@ -11,7 +11,7 @@ import UIKit
 class FlickrClient{
     static let shared = FlickrClient()
     static let apiKey = "9f464e9ce36ddd0bf813be86292a29d0"
-    let cache = NSCache<NSString, UIImage>()
+    //let cache = NSCache<NSString, UIImage>()
     
     private init() {}
     
@@ -23,7 +23,7 @@ class FlickrClient{
         var stringValue: String{
             switch self {
             case .getPhotos:
-                return Endpoints.base + "?method=flickr.photos.search&api_key=" + apiKey + "&nojsoncallback=1&format=json&per_page=50"
+                return Endpoints.base + "?method=flickr.photos.search&api_key=" + apiKey + "&nojsoncallback=1&format=json&per_page=50&extras=url_m"
             }
         }
     }
@@ -62,28 +62,26 @@ class FlickrClient{
         task.resume()
     }
     
-    func getPhotoImage(farm:Int, server:String, id:String, secret:String, completion: @escaping (UIImage?)->Void){
-        let urlString = "https://farm" + String(farm) + ".staticflickr.com/" + server + "/" + id + "_" + secret + "_q.jpg"
-        let cacheKey = NSString(string: urlString)
+    func getPhotoImage(url:URL, completion: @escaping (UIImage?)->Void){
         
-        if let image = cache.object(forKey: cacheKey){
-            DispatchQueue.main.async {
-                completion(image)
-            }
-            return
-        }
+//        let cacheKey = NSString(string: urlString)
+//
+//        if let image = cache.object(forKey: cacheKey){
+//            DispatchQueue.main.async {
+//                completion(image)
+//            }
+//            return
+//        }
         
-        guard let url = URL(string: urlString) else {
-            DispatchQueue.main.async {
-                completion(nil)
-            }
-            return
-            
-        }
+//        guard let url = URL(string: urlString) else {
+//            DispatchQueue.main.async {
+//                completion(nil)
+//            }
+//            return
+//        }
         
-        let task = URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
-            guard let self = self,
-                error == nil,
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard error == nil,
                 let response = response as? HTTPURLResponse, response.statusCode == 200,
                 let data = data,
                 let image = UIImage(data: data) else{
@@ -93,7 +91,7 @@ class FlickrClient{
                     return
                 }
             
-            self.cache.setObject(image, forKey: cacheKey)
+            //self.cache.setObject(image, forKey: cacheKey)
             DispatchQueue.main.async {
                 completion(image)
             }

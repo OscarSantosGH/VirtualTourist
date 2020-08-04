@@ -6,13 +6,17 @@
 //  Copyright © 2020 Oscar Santos. All rights reserved.
 //
 
-import UIKit
 import MapKit
 
 class TravelPin: NSObject, MKAnnotation {
     var coordinate: CLLocationCoordinate2D
+    var pin:Pin
     
-    init(coordinate: CLLocationCoordinate2D) {
-        self.coordinate = coordinate
+    init(pin: Pin) {
+        
+        self.pin = pin
+        coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.latitude)
+        super.init()
+        
     }
 }

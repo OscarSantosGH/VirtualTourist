@@ -8,31 +8,34 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class PhotoAlbumViewController: UIViewController {
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var backButton: UIButton!
-    @IBOutlet weak var newCollectionButton: UIButton!
+    @IBOutlet weak var newCollectionButton: UIBarButtonItem!
     
-    var photos = [FKRPhotoResponse]()
-    var location = CLLocationCoordinate2D()
+    
+    private var photos = [Photo]()
+    var pin:Pin!
+    
+    var persistentManager:PersistentManager!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         configureCollectionView()
+        configure()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
+    override func viewDidDisappear(_ animated: Bool) {
+        photos = []
+        collectionView.reloadData()
     }
     
-    func configureCollectionView(){
-        let nib = UINib(nibName: "PhotoCell", bundle: nil)
-        collectionView.register(nib, forCellWithReuseIdentifier: "photoCell")
+    private func configureCollectionView(){
+        //collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: "photoCell")
         collectionView.dataSource = self
         collectionView.delegate = self
         
@@ -46,8 +49,36 @@ class PhotoAlbumViewController: UIViewController {
         flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
     }
     
-    func downloadPhotos(){
-        FlickrClient.shared.getPhotosFromLocation(lat: location.latitude, long: location.longitude) { [weak self] (photos, error) in
+    
+    func configure(){
+        let fetchRequest:NSFetchRequest<Photo> = Photo.fetchRequest()
+        let predicate = NSPredicate(format: "pin == %@", pin)
+        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.predicate = predicate
+        if let result = try? persistentManager.viewContext.fetch(fetchRequest){
+            if result.isEmpty{
+                print("Ta vacio: \(result.count)")
+                downloadPhotos()
+            }else{
+                print("tiene algo")
+                photos = result
+                collectionView.reloadData()
+            }
+        }
+        
+//        if pin.photos!.count > 0{
+//            print("tiene fotos")
+//        }else{
+//            print("ta vacio")
+//            downloadPhotos()
+//        }
+    }
+    
+    
+    
+    private func downloadPhotos(){
+        FlickrClient.shared.getPhotosFromLocation(lat: pin.latitude, long: pin.longitude) { [weak self] (photos, error) in
             guard let self = self else {return}
             if error != nil{
                 if let fkrError = error as? FKRError{
@@ -57,21 +88,48 @@ class PhotoAlbumViewController: UIViewController {
                 }
             }else{
                 guard let photos = photos else {return}
-                self.photos = photos
-                self.collectionView.reloadData()
+                if photos.isEmpty{
+                    print("NO Photo Here")
+                }else{
+                    for photoResponse in photos{
+                        let photo = Photo(context: self.persistentManager.viewContext)
+                        photo.id = photoResponse.id
+                        guard let url = URL(string: photoResponse.url) else {return}
+                        photo.url = url
+                        photo.pin = self.pin
+                        self.photos.append(photo)
+                        
+                        
+                    }
+                    self.collectionView.reloadData()
+                    do{
+                       try self.persistentManager.viewContext.save()
+                        print("salvados")
+                    }catch{
+                        print(error.localizedDescription)
+                    }
+                }
             }
         }
     }
+    
+    
 
 
-    @IBAction func backAction(_ sender: Any) {
-        UIView.animate(withDuration: 0.5) { [weak self] in
-            guard let self = self else {return}
-            let frame = self.view.frame
-            //let yComponent = UIScreen.main.bounds.height - 200
-            self.view.frame = CGRect(x: 0, y: self.view.frame.maxY, width: frame.width, height: frame.height)
-        }
-    }
+//    @IBAction func backAction(_ sender: Any) {
+//        UIView.animate(withDuration: 0.5, animations: { [weak self] in
+//            guard let self = self else {return}
+//            let frame = self.view.frame
+//            //let yComponent = UIScreen.main.bounds.height - 200
+//            self.view.frame = CGRect(x: 0, y: self.view.frame.maxY, width: frame.width, height: frame.height)
+//        }) { [weak self] (completed)  in
+//            guard let self = self else {return}
+//            if completed{
+//                self.photos = []
+//                self.collectionView.reloadData()
+//            }
+//        }
+//    }
     
     @IBAction func newCollectionAction(_ sender: Any) {
     }
@@ -95,7 +153,7 @@ extension PhotoAlbumViewController: UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let photo = photos[indexPath.row]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCell
-        cell.setImage(photo: photo)
+        cell.setImage(photo: photo, persistentManager: persistentManager)
         return cell
     }
     
