@@ -28,9 +28,29 @@ class PhotoAlbumViewController: UIViewController {
         super.viewDidLoad()
 
         configureCollectionView()
-        configure()
         showLocation()
+        checkPinPhotoCollection()
     }
+    override func viewDidDisappear(_ animated: Bool) {
+        photos = []
+        collectionView.reloadData()
+    }
+    
+    
+    private func configureCollectionView(){
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        let width = view.bounds.width
+        let padding: CGFloat = 12
+        let minimunItemSpacing: CGFloat = 10
+        let availableWidth = width - (padding * 2) - (minimunItemSpacing * 2)
+        let itemWidth = availableWidth / 3
+        
+        flowLayout.sectionInset = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
+        flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
+    }
+    
     
     private func showLocation(){
         // create a custom MKAnnotation for the Students Location
@@ -55,38 +75,24 @@ class PhotoAlbumViewController: UIViewController {
         timer.invalidate()
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        photos = []
-        collectionView.reloadData()
-    }
     
-    private func configureCollectionView(){
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        
-        let width = view.bounds.width
-        let padding: CGFloat = 12
-        let minimunItemSpacing: CGFloat = 10
-        let availableWidth = width - (padding * 2) - (minimunItemSpacing * 2)
-        let itemWidth = availableWidth / 3
-        
-        flowLayout.sectionInset = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
-        flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
-    }
-    
-    
-    func configure(){
-        let fetchRequest:NSFetchRequest<Photo> = Photo.fetchRequest()
-        let predicate = NSPredicate(format: "pin == %@", pin)
-        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        fetchRequest.predicate = predicate
-        if let result = try? persistentManager.viewContext.fetch(fetchRequest){
-            if result.isEmpty{
-                downloadPhotos()
-            }else{
-                photos = result
-                collectionView.reloadData()
+    func checkPinPhotoCollection(){
+        guard let pinCollection = pin.collection else {return}
+        if pinCollection.isEmpty{
+            downloadPhotos()
+        }else{
+            let fetchRequest:NSFetchRequest<Photo> = Photo.fetchRequest()
+            let predicate = NSPredicate(format: "photoCollection == %@", pinCollection)
+            let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
+            fetchRequest.sortDescriptors = [sortDescriptor]
+            fetchRequest.predicate = predicate
+            if let result = try? persistentManager.viewContext.fetch(fetchRequest){
+                if result.isEmpty{
+                    downloadPhotos()
+                }else{
+                    photos = result
+                    collectionView.reloadData()
+                }
             }
         }
     }
@@ -112,7 +118,7 @@ class PhotoAlbumViewController: UIViewController {
                         photo.id = photoResponse.id
                         guard let url = URL(string: photoResponse.url) else {return}
                         photo.url = url
-                        photo.pin = self.pin
+                        photo.photoCollection = self.pin.collection
                         self.photos.append(photo)
                         
                         
