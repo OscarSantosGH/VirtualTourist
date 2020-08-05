@@ -13,7 +13,7 @@ class PhotoCell: UICollectionViewCell {
     @IBOutlet weak var photoImageView: UIImageView!
     var imageURLPath: URL?
     
-    func setImage(photo:Photo, persistentManager:PersistentManager){
+    func setImage(photo:Photo){
         guard let url = photo.url else {return}
         imageURLPath = url
         FlickrClient.shared.getPhotoImage(url: url) { [weak self] (image) in

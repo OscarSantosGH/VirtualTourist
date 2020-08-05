@@ -12,11 +12,9 @@ import CoreData
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    let persistentManager = PersistentManager(modelName: "VirtualTourist")
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        persistentManager.load()
+        PersistentManager.shared.load()
         return true
     }
 

@@ -10,13 +10,15 @@ import Foundation
 import CoreData
 
 class PersistentManager{
+    static let shared = PersistentManager(modelName: "VirtualTourist")
+    
     let persistentContainer:NSPersistentContainer
     
     var viewContext:NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     
-    init(modelName:String){
+    private init(modelName:String){
         persistentContainer = NSPersistentContainer(name: modelName)
     }
     

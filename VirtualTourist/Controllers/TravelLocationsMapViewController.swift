@@ -15,8 +15,6 @@ class TravelLocationsMapViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     
     var canDropPin = true
-    
-    var persistentManager:PersistentManager!
     var pins:[Pin] = []
 
     override func viewDidLoad() {
@@ -34,7 +32,7 @@ class TravelLocationsMapViewController: UIViewController {
         let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
-        if let result = try? persistentManager.viewContext.fetch(fetchRequest){
+        if let result = try? PersistentManager.shared.viewContext.fetch(fetchRequest){
             pins = result
             print("pin result: \(result.count)")
             updateMapPins()
@@ -72,7 +70,7 @@ class TravelLocationsMapViewController: UIViewController {
     }
     
     func dropPin(coordinate:CLLocationCoordinate2D){
-        let pin = Pin(context: persistentManager.viewContext)
+        let pin = Pin(context: PersistentManager.shared.viewContext)
         pin.latitude = coordinate.latitude
         pin.longitude = coordinate.longitude
         
@@ -82,7 +80,7 @@ class TravelLocationsMapViewController: UIViewController {
         generator.impactOccurred()
         
         do{
-            try persistentManager.viewContext.save()
+            try PersistentManager.shared.viewContext.save()
             pins.append(pin)
             mapView.addAnnotation(annotation)
         }catch{
@@ -95,7 +93,6 @@ class TravelLocationsMapViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "photoAlbumSegue"{
             let photoAlbumVC = segue.destination as! PhotoAlbumViewController
-            photoAlbumVC.persistentManager = persistentManager
             photoAlbumVC.pin = sender as? Pin
         }
     }

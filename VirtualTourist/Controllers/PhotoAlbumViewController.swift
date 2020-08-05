@@ -20,7 +20,6 @@ class PhotoAlbumViewController: UIViewController {
     
     private var photos = [Photo]()
     var pin:Pin!
-    var persistentManager:PersistentManager!
     // timer used to delay the animation of the zoom to the location
     var timer:Timer!
     
@@ -86,7 +85,7 @@ class PhotoAlbumViewController: UIViewController {
             let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
             fetchRequest.sortDescriptors = [sortDescriptor]
             fetchRequest.predicate = predicate
-            if let result = try? persistentManager.viewContext.fetch(fetchRequest){
+            if let result = try? PersistentManager.shared.viewContext.fetch(fetchRequest){
                 if result.isEmpty{
                     downloadPhotos()
                 }else{
@@ -114,7 +113,7 @@ class PhotoAlbumViewController: UIViewController {
                     print("NO Photo Here")
                 }else{
                     for photoResponse in photos{
-                        let photo = Photo(context: self.persistentManager.viewContext)
+                        let photo = Photo(context: PersistentManager.shared.viewContext)
                         photo.id = photoResponse.id
                         guard let url = URL(string: photoResponse.url) else {return}
                         photo.url = url
@@ -125,7 +124,7 @@ class PhotoAlbumViewController: UIViewController {
                     }
                     self.collectionView.reloadData()
                     do{
-                       try self.persistentManager.viewContext.save()
+                        try PersistentManager.shared.viewContext.save()
                     }catch{
                         print(error.localizedDescription)
                     }
@@ -175,7 +174,7 @@ extension PhotoAlbumViewController: UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let photo = photos[indexPath.row]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCell
-        cell.setImage(photo: photo, persistentManager: persistentManager)
+        cell.setImage(photo: photo)
         return cell
     }
     
@@ -188,9 +187,9 @@ extension PhotoAlbumViewController: UICollectionViewDataSource{
 extension PhotoAlbumViewController: UICollectionViewDelegate{
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let photoToDelete = photos[indexPath.row]
-        persistentManager.viewContext.delete(photoToDelete)
+        PersistentManager.shared.viewContext.delete(photoToDelete)
         do{
-            try persistentManager.viewContext.save()
+            try PersistentManager.shared.viewContext.save()
             photos.remove(at: indexPath.row)
             collectionView.deleteItems(at: [indexPath])
         }catch{
