@@ -166,6 +166,7 @@ class PhotoAlbumViewController: UIViewController {
 
 }
 
+//MARK: CollectionView Data Source
 extension PhotoAlbumViewController: UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         photos.count
@@ -183,9 +184,18 @@ extension PhotoAlbumViewController: UICollectionViewDataSource{
     }
 }
 
+//MARK: CollectionView Delegate
 extension PhotoAlbumViewController: UICollectionViewDelegate{
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        photos.remove(at: indexPath.row)
-        collectionView.deleteItems(at: [indexPath])
+        let photoToDelete = photos[indexPath.row]
+        persistentManager.viewContext.delete(photoToDelete)
+        do{
+            try persistentManager.viewContext.save()
+            photos.remove(at: indexPath.row)
+            collectionView.deleteItems(at: [indexPath])
+        }catch{
+            print("error deleting the Photo: \(error.localizedDescription)")
+        }
+        
     }
 }
