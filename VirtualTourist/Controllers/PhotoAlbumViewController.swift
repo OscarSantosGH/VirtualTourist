@@ -25,7 +25,7 @@ class PhotoAlbumViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        newCollectionButton.isEnabled = false
         configureCollectionView()
         showLocation()
         checkPinPhotoCollection()
@@ -78,6 +78,7 @@ class PhotoAlbumViewController: UIViewController {
     func checkPinPhotoCollection(){
         guard let pinCollection = pin.collection else {return}
         if pinCollection.isEmpty{
+            pinCollection.currentPage = 1
             downloadPhotos()
         }else{
             let fetchRequest:NSFetchRequest<Photo> = Photo.fetchRequest()
@@ -86,29 +87,32 @@ class PhotoAlbumViewController: UIViewController {
             fetchRequest.sortDescriptors = [sortDescriptor]
             fetchRequest.predicate = predicate
             if let result = try? PersistentManager.shared.viewContext.fetch(fetchRequest){
-                if result.isEmpty{
-                    downloadPhotos()
-                }else{
-                    photos = result
-                    collectionView.reloadData()
+                photos = result
+                collectionView.reloadData()
+                if pinCollection.totalPages > 1{
+                    newCollectionButton.isEnabled = true
                 }
             }
         }
     }
     
     
-    
-    private func downloadPhotos(){
-        FlickrClient.shared.getPhotosFromLocation(lat: pin.latitude, long: pin.longitude) { [weak self] (photos, error) in
+    private func downloadPhotos(fromPage page:Int = 1){
+        FlickrClient.shared.getPhotosFromLocation(lat: pin.latitude, long: pin.longitude, page: page) { [weak self] (collection, error) in
             guard let self = self else {return}
             if error != nil{
                 if let fkrError = error as? FKRError{
                     self.presentVTAlert(title: fkrError.message, message: fkrError.errorDescription)
                 }else{
                     self.presentVTAlert(title: "Something went wrong", message: error!.localizedDescription)
+                    //self.photos = []
+                    self.collectionView.reloadData()
                 }
             }else{
-                guard let photos = photos else {return}
+                guard let photoCollection = collection else {return}
+                self.pin.collection?.totalPages = Int16(photoCollection.pages)
+                
+                let photos = photoCollection.photo
                 if photos.isEmpty{
                     print("NO Photo Here")
                 }else{
@@ -119,8 +123,6 @@ class PhotoAlbumViewController: UIViewController {
                         photo.url = url
                         photo.photoCollection = self.pin.collection
                         self.photos.append(photo)
-                        
-                        
                     }
                     self.collectionView.reloadData()
                     do{
@@ -129,29 +131,44 @@ class PhotoAlbumViewController: UIViewController {
                         print(error.localizedDescription)
                     }
                 }
+                
+                if let totalPages = self.pin.collection?.totalPages{
+                    if totalPages > 1{
+                        self.newCollectionButton.isEnabled = true
+                    }
+                }
             }
         }
     }
     
-    
 
-
-//    @IBAction func backAction(_ sender: Any) {
-//        UIView.animate(withDuration: 0.5, animations: { [weak self] in
-//            guard let self = self else {return}
-//            let frame = self.view.frame
-//            //let yComponent = UIScreen.main.bounds.height - 200
-//            self.view.frame = CGRect(x: 0, y: self.view.frame.maxY, width: frame.width, height: frame.height)
-//        }) { [weak self] (completed)  in
-//            guard let self = self else {return}
-//            if completed{
-//                self.photos = []
-//                self.collectionView.reloadData()
-//            }
-//        }
-//    }
     
     @IBAction func newCollectionAction(_ sender: Any) {
+        newCollectionButton.isEnabled = false
+        for photoToDelete in photos{
+            PersistentManager.shared.viewContext.delete(photoToDelete)
+        }
+        do{
+            try PersistentManager.shared.viewContext.save()
+        }catch{
+            print("error saving the context: \(error.localizedDescription)")
+        }
+        photos = []
+        collectionView.reloadData()
+        guard let photoCollection = pin.collection else {return}
+        
+        
+        let currentPage:Int = Int(photoCollection.currentPage)
+        let totalPages:Int = Int(photoCollection.totalPages)
+        var randomPage:Int
+            
+        repeat{
+            randomPage = Int.random(in: 1...totalPages)
+        }while randomPage == currentPage
+            
+        photoCollection.currentPage = Int16(randomPage)
+        downloadPhotos(fromPage: randomPage)
+        
     }
     /*
     // MARK: - Navigation
@@ -193,7 +210,7 @@ extension PhotoAlbumViewController: UICollectionViewDelegate{
             photos.remove(at: indexPath.row)
             collectionView.deleteItems(at: [indexPath])
         }catch{
-            print("error deleting the Photo: \(error.localizedDescription)")
+            print("error saving the context: \(error.localizedDescription)")
         }
         
     }

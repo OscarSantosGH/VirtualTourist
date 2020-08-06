@@ -29,7 +29,7 @@ class FlickrClient{
     }
     
     
-    func getPhotosFromLocation(lat:Double, long:Double, page:Int = 1, completion: @escaping ([FKRPhotoResponse]?, Error?)->Void){
+    func getPhotosFromLocation(lat:Double, long:Double, page:Int = 1, completion: @escaping (FKRPhotosResponse?, Error?)->Void){
         guard let url = URL(string: Endpoints.getPhotos.stringValue + "&lat=" + String(lat) + "&lon=" + String(long) + "&page=" + String(page)) else {return}
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             if error != nil {
@@ -51,10 +51,11 @@ class FlickrClient{
                 let response = try decoder.decode(FKRPhotosSearchResponse.self, from: data)
                 let photos = response.photos
                 DispatchQueue.main.async {
-                    completion(photos.photo, nil)
+                    completion(photos, nil)
                 }
             }catch{
                 DispatchQueue.main.async {
+                    print("error decoding")
                     completion(nil, error)
                 }
             }
@@ -63,23 +64,6 @@ class FlickrClient{
     }
     
     func getPhotoImage(url:URL, completion: @escaping (UIImage?)->Void){
-        
-//        let cacheKey = NSString(string: urlString)
-//
-//        if let image = cache.object(forKey: cacheKey){
-//            DispatchQueue.main.async {
-//                completion(image)
-//            }
-//            return
-//        }
-        
-//        guard let url = URL(string: urlString) else {
-//            DispatchQueue.main.async {
-//                completion(nil)
-//            }
-//            return
-//        }
-        
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard error == nil,
                 let response = response as? HTTPURLResponse, response.statusCode == 200,
@@ -91,7 +75,6 @@ class FlickrClient{
                     return
                 }
             
-            //self.cache.setObject(image, forKey: cacheKey)
             DispatchQueue.main.async {
                 completion(image)
             }
