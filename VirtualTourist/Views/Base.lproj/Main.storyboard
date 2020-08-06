@@ -64,18 +64,26 @@
                                             <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OhG-xK-AZ0">
-                                                    <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="photo" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="OhG-xK-AZ0">
+                                                    <rect key="frame" x="0.0" y="1" width="128" height="125.5"/>
+                                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                                    <color key="tintColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                                 </imageView>
+                                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="Fjs-AU-7es">
+                                                    <rect key="frame" x="45.5" y="45.5" width="37" height="37"/>
+                                                </activityIndicatorView>
                                             </subviews>
                                         </view>
                                         <constraints>
+                                            <constraint firstItem="Fjs-AU-7es" firstAttribute="centerX" secondItem="llE-gf-oLQ" secondAttribute="centerX" id="0uW-kj-0xf"/>
                                             <constraint firstItem="OhG-xK-AZ0" firstAttribute="top" secondItem="llE-gf-oLQ" secondAttribute="top" id="9dq-qw-dC8"/>
                                             <constraint firstAttribute="bottom" secondItem="OhG-xK-AZ0" secondAttribute="bottom" id="XLX-L3-qah"/>
+                                            <constraint firstItem="Fjs-AU-7es" firstAttribute="centerY" secondItem="llE-gf-oLQ" secondAttribute="centerY" id="XcA-J6-F6F"/>
                                             <constraint firstAttribute="trailing" secondItem="OhG-xK-AZ0" secondAttribute="trailing" id="kv5-8a-GbK"/>
                                             <constraint firstItem="OhG-xK-AZ0" firstAttribute="leading" secondItem="llE-gf-oLQ" secondAttribute="leading" id="rRt-Gk-IFO"/>
                                         </constraints>
                                         <connections>
+                                            <outlet property="activityIndicator" destination="Fjs-AU-7es" id="2Qo-if-X3G"/>
                                             <outlet property="photoImageView" destination="OhG-xK-AZ0" id="bcb-eJ-6mf"/>
                                         </connections>
                                     </collectionViewCell>
@@ -154,4 +162,7 @@
             <point key="canvasLocation" x="511.59420289855075" y="119.86607142857142"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="photo" catalog="system" width="128" height="93"/>
+    </resources>
 </document>

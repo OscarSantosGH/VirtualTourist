@@ -105,7 +105,6 @@ class PhotoAlbumViewController: UIViewController {
                     self.presentVTAlert(title: fkrError.message, message: fkrError.errorDescription)
                 }else{
                     self.presentVTAlert(title: "Something went wrong", message: error!.localizedDescription)
-                    //self.photos = []
                     self.collectionView.reloadData()
                 }
             }else{
@@ -170,15 +169,6 @@ class PhotoAlbumViewController: UIViewController {
         downloadPhotos(fromPage: randomPage)
         
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
 

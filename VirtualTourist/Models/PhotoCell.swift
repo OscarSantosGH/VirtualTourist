@@ -11,9 +11,12 @@ import UIKit
 class PhotoCell: UICollectionViewCell {
     
     @IBOutlet weak var photoImageView: UIImageView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     var imageURLPath: URL?
     
     func setImage(photo:Photo){
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
         guard let url = photo.url else {return}
         imageURLPath = url
         FlickrClient.shared.getPhotoImage(url: url) { [weak self] (image) in
@@ -22,6 +25,8 @@ class PhotoCell: UICollectionViewCell {
                 guard let imageUnwrapped = image else {return}
                 self.photoImageView.image = imageUnwrapped
                 photo.image = imageUnwrapped.jpegData(compressionQuality: 1)
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.isHidden = true
             }else{
                 return
             }
