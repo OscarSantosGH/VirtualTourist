@@ -15,6 +15,7 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var newCollectionButton: UIBarButtonItem!
+    @IBOutlet var noPhotosFoundLabel: UILabel!
     @IBOutlet weak var mapView: MKMapView!
     
     
@@ -33,6 +34,9 @@ class PhotoAlbumViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         photos = []
         collectionView.reloadData()
+        if noPhotosFoundLabel.isDescendant(of: view){
+            noPhotosFoundLabel.removeFromSuperview()
+        }
     }
     
     
@@ -113,7 +117,12 @@ class PhotoAlbumViewController: UIViewController {
                 
                 let photos = photoCollection.photo
                 if photos.isEmpty{
-                    print("NO Photo Here")
+                    self.view.addSubview(self.noPhotosFoundLabel)
+                    self.noPhotosFoundLabel.translatesAutoresizingMaskIntoConstraints = false
+                    NSLayoutConstraint.activate([
+                        self.noPhotosFoundLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                        self.noPhotosFoundLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                    ])
                 }else{
                     for photoResponse in photos{
                         let photo = Photo(context: PersistentManager.shared.viewContext)

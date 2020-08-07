@@ -34,7 +34,6 @@ class TravelLocationsMapViewController: UIViewController {
         fetchRequest.sortDescriptors = [sortDescriptor]
         if let result = try? PersistentManager.shared.viewContext.fetch(fetchRequest){
             pins = result
-            print("pin result: \(result.count)")
             updateMapPins()
         }
     }
@@ -112,7 +111,6 @@ extension TravelLocationsMapViewController: MKMapViewDelegate{
         if pinView == nil {
             pinView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             pinView!.canShowCallout = false
-            pinView?.markerTintColor = UIColor.red
 
         } else {
             pinView!.annotation = annotation
