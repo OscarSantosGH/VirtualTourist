@@ -18,7 +18,6 @@ class PhotoAlbumViewController: UIViewController {
     @IBOutlet var noPhotosFoundLabel: UILabel!
     @IBOutlet weak var mapView: MKMapView!
     
-    
     private var photos = [Photo]()
     var pin:Pin!
     // timer used to delay the animation of the zoom to the location
@@ -117,12 +116,7 @@ class PhotoAlbumViewController: UIViewController {
                 
                 let photos = photoCollection.photo
                 if photos.isEmpty{
-                    self.view.addSubview(self.noPhotosFoundLabel)
-                    self.noPhotosFoundLabel.translatesAutoresizingMaskIntoConstraints = false
-                    NSLayoutConstraint.activate([
-                        self.noPhotosFoundLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
-                        self.noPhotosFoundLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
-                    ])
+                    self.showNoPhotoLabel()
                 }else{
                     for photoResponse in photos{
                         let photo = Photo(context: PersistentManager.shared.viewContext)
@@ -138,6 +132,7 @@ class PhotoAlbumViewController: UIViewController {
                     }catch{
                         print(error.localizedDescription)
                     }
+                    
                 }
                 
                 if let totalPages = self.pin.collection?.totalPages{
@@ -149,7 +144,14 @@ class PhotoAlbumViewController: UIViewController {
         }
     }
     
-
+    func showNoPhotoLabel(){
+        self.view.addSubview(self.noPhotosFoundLabel)
+        self.noPhotosFoundLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            self.noPhotosFoundLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+            self.noPhotosFoundLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+        ])
+    }
     
     @IBAction func newCollectionAction(_ sender: Any) {
         newCollectionButton.isEnabled = false
@@ -164,7 +166,6 @@ class PhotoAlbumViewController: UIViewController {
         photos = []
         collectionView.reloadData()
         guard let photoCollection = pin.collection else {return}
-        
         
         let currentPage:Int = Int(photoCollection.currentPage)
         let totalPages:Int = Int(photoCollection.totalPages)
@@ -181,7 +182,7 @@ class PhotoAlbumViewController: UIViewController {
 
 }
 
-//MARK: CollectionView Data Source
+//MARK: -CollectionView Data Source
 extension PhotoAlbumViewController: UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         photos.count
@@ -199,7 +200,7 @@ extension PhotoAlbumViewController: UICollectionViewDataSource{
     }
 }
 
-//MARK: CollectionView Delegate
+//MARK: -CollectionView Delegate
 extension PhotoAlbumViewController: UICollectionViewDelegate{
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let photoToDelete = photos[indexPath.row]

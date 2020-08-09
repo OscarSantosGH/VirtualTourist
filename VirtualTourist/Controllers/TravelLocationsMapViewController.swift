@@ -16,6 +16,8 @@ class TravelLocationsMapViewController: UIViewController {
     
     var canDropPin = true
     var pins:[Pin] = []
+    
+    var persistedMapLocationKey:String = "persistedMapLocation"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,8 +25,8 @@ class TravelLocationsMapViewController: UIViewController {
         let gesture:UILongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(dropPinGesture(gesture:)))
         gesture.numberOfTouchesRequired = 1
         mapView.addGestureRecognizer(gesture)
-        
         mapView.delegate = self
+        loadPersistedMapRegion()
         fetchDataFromDataStore()
     }
     
@@ -59,7 +61,6 @@ class TravelLocationsMapViewController: UIViewController {
             
             let touch: CGPoint = gesture.location(in: self.mapView)
             let coordinate: CLLocationCoordinate2D = self.mapView.convert(touch, toCoordinateFrom: self.mapView)
-            //self.mapView.setCenter(coordinate, animated: true)
             
             dropPin(coordinate: coordinate)
 
@@ -99,7 +100,32 @@ class TravelLocationsMapViewController: UIViewController {
 
 }
 
+//MARK: - MKMapViewDelegate
 extension TravelLocationsMapViewController: MKMapViewDelegate{
+    
+    func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
+        setPersistedMapRegion()
+    }
+    
+    func setPersistedMapRegion(){
+        let mapRegion = [
+            "lat":mapView.centerCoordinate.latitude,
+            "long":mapView.centerCoordinate.longitude,
+            "latRegionDelta":mapView.region.span.latitudeDelta,
+            "longRegionDelta":mapView.region.span.longitudeDelta
+        ]
+        UserDefaults.standard.set(mapRegion, forKey: persistedMapLocationKey)
+    }
+    
+    func loadPersistedMapRegion(){
+        guard let mapRegion = UserDefaults.standard.dictionary(forKey: persistedMapLocationKey) else {return}
+        
+        let location = mapRegion as! [String:CLLocationDegrees]
+        let coordinate = CLLocationCoordinate2D(latitude: location["lat"]!, longitude: location["long"]!)
+        let span = MKCoordinateSpan(latitudeDelta: location["latRegionDelta"]!, longitudeDelta: location["longRegionDelta"]!)
+        
+        mapView.setRegion(MKCoordinateRegion(center: coordinate, span: span), animated: true)
+    }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         guard annotation is TravelPin else {return nil}
