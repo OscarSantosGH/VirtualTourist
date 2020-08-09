@@ -23,11 +23,27 @@ class PersistentManager{
     }
     
     func load(completion: (() -> Void)? = nil){
-        persistentContainer.loadPersistentStores { (storeDescription, error) in
+        persistentContainer.loadPersistentStores { [weak self] (storeDescription, error) in
+            guard let self = self else {return}
             guard error == nil else{
                 fatalError(error!.localizedDescription)
             }
+            self.autoSaveViewContext()
             completion?()
+        }
+    }
+}
+
+extension PersistentManager{
+    func autoSaveViewContext(interval:TimeInterval = 10){
+        guard interval > 0 else {return}
+        if viewContext.hasChanges{
+            viewContext.saveOrRollback()
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + interval) { [weak self] in
+            guard let self = self else {return}
+            self.autoSaveViewContext()
         }
     }
 }
