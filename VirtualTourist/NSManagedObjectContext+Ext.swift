@@ -9,8 +9,8 @@
 import CoreData
 
 extension NSManagedObjectContext{
+    // helper function to save the context securely
     public func saveOrRollback(){
-        
         if hasChanges{
             do {
                 try save()
@@ -18,6 +18,5 @@ extension NSManagedObjectContext{
                 rollback()
             }
         }
-        
     }
 }

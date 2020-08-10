@@ -12,7 +12,9 @@ import CoreData
 extension Pin {
     public override func awakeFromInsert() {
         super.awakeFromInsert()
+        // initiate the creationDate with the pin creation time
         creationDate = Date()
+        // initiate an empty PhotoCollection associate with the pin recently created
         collection = PhotoCollection(context: managedObjectContext!)
     }
 }

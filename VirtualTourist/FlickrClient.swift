@@ -11,7 +11,6 @@ import UIKit
 class FlickrClient{
     static let shared = FlickrClient()
     static let apiKey = "9f464e9ce36ddd0bf813be86292a29d0"
-    //let cache = NSCache<NSString, UIImage>()
     
     private init() {}
     

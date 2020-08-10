@@ -10,6 +10,7 @@ import Foundation
 import CoreData
 
 class PersistentManager{
+    // property created to use this class as a singleton
     static let shared = PersistentManager(modelName: "VirtualTourist")
     
     let persistentContainer:NSPersistentContainer

@@ -30,6 +30,7 @@ class PhotoAlbumViewController: UIViewController {
         showLocation()
         checkPinPhotoCollection()
     }
+    // clean PhotoAlbumView when disappear
     override func viewDidDisappear(_ animated: Bool) {
         photos = []
         collectionView.reloadData()
@@ -38,7 +39,7 @@ class PhotoAlbumViewController: UIViewController {
         }
     }
     
-    
+    // configure collectionView's flowLayout
     private func configureCollectionView(){
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -53,7 +54,7 @@ class PhotoAlbumViewController: UIViewController {
         flowLayout.itemSize = CGSize(width: itemWidth, height: itemWidth)
     }
     
-    
+    // set the pin in the mapView
     private func showLocation(){
         // create a custom MKAnnotation for the Students Location
         let annotation = TravelPin(pin: pin)
@@ -63,7 +64,7 @@ class PhotoAlbumViewController: UIViewController {
         mapView.isUserInteractionEnabled = false
         mapView.addAnnotation(annotation)
     }
-    
+    // create a zoom animation to show the pin location
     @objc func zoomToLocation(){
         // get the coordinate
         let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
@@ -80,6 +81,7 @@ class PhotoAlbumViewController: UIViewController {
     
     func checkPinPhotoCollection(){
         guard let pinCollection = pin.collection else {return}
+        // if the pin collection is empty download the photos from the web, if not, get all the photos from the DataBase
         if pinCollection.isEmpty{
             pinCollection.currentPage = 1
             downloadPhotos()
@@ -108,13 +110,15 @@ class PhotoAlbumViewController: UIViewController {
                     self.presentVTAlert(title: fkrError.message, message: fkrError.errorDescription)
                 }else{
                     self.presentVTAlert(title: "Something went wrong", message: error!.localizedDescription)
-                    self.collectionView.reloadData()
                 }
+                self.collectionView.reloadData()
             }else{
                 guard let photoCollection = collection else {return}
+                // set the totalPages to the collection
                 self.pin.collection?.totalPages = Int16(photoCollection.pages)
                 
                 let photos = photoCollection.photo
+                // if there is no photo for this location show the "No Photo Label"
                 if photos.isEmpty{
                     self.showNoPhotoLabel()
                 }else{
@@ -134,7 +138,7 @@ class PhotoAlbumViewController: UIViewController {
                     }
                     
                 }
-                
+                // enable newCollectionButton if the collection has more than 1 pages
                 if let totalPages = self.pin.collection?.totalPages{
                     if totalPages > 1{
                         self.newCollectionButton.isEnabled = true
@@ -143,7 +147,7 @@ class PhotoAlbumViewController: UIViewController {
             }
         }
     }
-    
+    // if there is no photo for this location show the "No Photo Label"
     func showNoPhotoLabel(){
         self.view.addSubview(self.noPhotosFoundLabel)
         self.noPhotosFoundLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -154,7 +158,9 @@ class PhotoAlbumViewController: UIViewController {
     }
     
     @IBAction func newCollectionAction(_ sender: Any) {
+        // disable newCollectionButton until finish downloading new photos
         newCollectionButton.isEnabled = false
+        // delete all the photos in the photos array from the DataBase
         for photoToDelete in photos{
             PersistentManager.shared.viewContext.delete(photoToDelete)
         }
@@ -170,12 +176,13 @@ class PhotoAlbumViewController: UIViewController {
         let currentPage:Int = Int(photoCollection.currentPage)
         let totalPages:Int = Int(photoCollection.totalPages)
         var randomPage:Int
-            
+        // repeat the random generated page if is the same as the current page
         repeat{
             randomPage = Int.random(in: 1...totalPages)
         }while randomPage == currentPage
-            
+        // set the current page
         photoCollection.currentPage = Int16(randomPage)
+        // download the new photos from the new page
         downloadPhotos(fromPage: randomPage)
         
     }

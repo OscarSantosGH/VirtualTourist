@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+// custom Error class that holds all the possible error that the Flickr API can throw
 struct FKRError: Error, Decodable{
     let stat:String
     let code:Int

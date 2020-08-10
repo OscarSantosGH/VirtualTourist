@@ -7,7 +7,7 @@
 //
 
 import MapKit
-
+// custom MKAnnotation that store a Pin
 class TravelPin: NSObject, MKAnnotation {
     var coordinate: CLLocationCoordinate2D
     var pin:Pin

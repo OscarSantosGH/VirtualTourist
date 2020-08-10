@@ -12,6 +12,7 @@ class PhotoCell: UICollectionViewCell {
     
     @IBOutlet weak var photoImageView: UIImageView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    // helper URL to check if the photo URL that make the call to the Flickr API is the same that's came back
     var imageURLPath: URL?
     
     func setImage(photo:Photo){
