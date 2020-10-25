@@ -10,7 +10,8 @@ import UIKit
 
 class FlickrClient{
     static let shared = FlickrClient()
-    static let apiKey = "9f464e9ce36ddd0bf813be86292a29d0"
+    //INSERT YOU OWN API KEY HERE
+    static let apiKey = "{INSERT YOU OWN API KEY HERE}"
     
     private init() {}
     
