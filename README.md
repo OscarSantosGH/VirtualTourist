@@ -2,6 +2,9 @@
 
 The Virtual Tourist allows users to drop pins on a map, as if they were stops on a tour. Users will then be able to download pictures for the location and persist both the pictures, and the association of the pictures with the pin.
 
+![home screen](https://github.com/OscarSantosGH/VirtualTourist/blob/master/Images/home.jpg?raw=true "Home Screen")
+![pin details](https://github.com/OscarSantosGH/VirtualTourist/blob/master/Images/pinDetail.jpg?raw=true "Pin Detail Screen")
+
 ## Usage
 This app use Flickr API to download images, so you must have a valid Flickr API Key. If you dont already have a Flickr account, you can get one [here](https://www.flickr.com).
 
